@@ -1,0 +1,6 @@
+#include<csdio>
+void main() {
+    int i = 25;
+    i+-;
+    printf("%d", i);
+}
