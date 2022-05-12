@@ -1,9 +1,8 @@
 
 ## Intro
 
-Write bugs I met and trivial features down
+Summarize bugs and trivial features
 
 Stay Hungry Stay Foolish
-> I'm stupid
-> LOL
+> I'm stupid LOL
 
