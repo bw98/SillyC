@@ -27,7 +27,7 @@ func test() {
 
     // 正确做法，使用下标形式的引用/指针
     res = make([]*Person, len(arr))
-    for idx := range arr {
+    for idx:= 0; idx < len(res); idx++ {
         res[idx] = &arr[idx]
     }
 
