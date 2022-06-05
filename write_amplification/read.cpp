@@ -3,50 +3,59 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <malloc.h>
 #include <string>
 #include <vector>
 #include <iostream>
 
+using std::cout;
+using std::endl;
+using std::cerr;
 using std::string;
 using std::vector;
 
 int main() {
+    const int start_fd = 100;
+    const int file_cnt = 100;
     vector<int> fds;
-    fds.reserve(500);
-
-    const int len = 1024;
-    const int start_fd = 1000;
-    const int file_cnt = 10;
-
+    fds.reserve(file_cnt);
     for (size_t i = start_fd; i < start_fd + file_cnt; ++i) {
-        int fd = open(std::to_string(i).c_str(), O_RDONLY | O_DIRECT, 0755);
-        std::cout << fd << std::endl;
+        string filename = std::to_string(i);
+        printf("opening file %s\n", filename.c_str());
+        int fd = open(filename.c_str(), O_RDONLY | O_DIRECT, 0755);
+        // int fd = open(filename.c_str(), O_RDONLY, 0755);
         fds.push_back(fd);
     }
 
+    for (int fd : fds) {
+        cout << fd << endl;
+    }
+
     // 执行一千次读 IO
+    const int len = 1 * 1024;
     for (size_t i = 0; i < 1000; ++i) {
-        int index = start_fd + i % 10;
-        lseek(fds[index], 1024 * 1024 * 512, SEEK_SET);  // 转移偏移量
+        int index = i % file_cnt;
+        lseek(fds[index], 512, SEEK_SET);  // 转移偏移量
         char* buf;
-        posix_memalign((void**)&buf, getpagesize(), 1025);
-        std::cout << fds[index] << std::endl;
-        size_t buf_size = len;
-        int ret = read(fds[index], buf, buf_size);
-        if(ret != buf_size) {
+        size_t buf_size = len * 2;
+        posix_memalign((void**)&buf, getpagesize(), buf_size);
+        // buf = (char*)malloc(sizeof(char) * buf_size);
+        printf("size of mem of buf: %d\n", malloc_usable_size(buf));
+        int ret = read(fds[index], buf, len);
+        printf("fd: %d, real read: %d, expected read: %d\n", fds[index], ret, len);
+        if(ret != len) {
             free(buf);
-            std::cerr << "Partially written！\n";
+            std::cerr << "partially read!\n";
             continue;
         }
         free(buf);
-        sync();  // 如果去掉sync, 因为这个文件数据现在还存在于 page cache, 所以可以预料到的读取数据会比较小, tps 也会比较小
+        sync();  // 如果 disable sync, 那么文件数据可能还存在于 page cache, 以后的读取可能会更快
     }
-    
 
     for(int fd : fds) {
         close(fd);
     }
 
-    return  0;
+    return 0;
 }
 
