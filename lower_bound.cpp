@@ -48,10 +48,24 @@ int my_lower_bound(const vector<int>& vec, int target) {
     int left = 0, right = vec.size();
     while (left < right) {
         int mid = left + (right - left) / 2;
-        if (vec[mid] >= target) {
-            right = mid;
-        } else {
+        if (vec[mid] < target) {
             left = mid + 1;
+        } else {
+            right = mid;
+        }
+    }
+
+    return vec[left];
+}
+
+int my_upper_bound(const vector<int>& vec, int target) {
+    int left = 0, right = vec.size();
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (vec[mid] <= target) {
+            left = mid + 1;
+        } else {
+            right = mid;
         }
     }
 
@@ -60,11 +74,18 @@ int my_lower_bound(const vector<int>& vec, int target) {
 
 int main() {
     // 实现一个 std::lower_bound()
-    vector<int> vec{1, 5, 6, 11, 19, 20};
+    vector<int> vec{1, 4, 4, 5, 6, 11, 19, 20};
     int res = my_lower_bound(vec, 4);
     cout << res << endl;
     
     auto it = std::lower_bound(vec.begin(), vec.end(), 4);
+    cout << *it << endl;
+
+    // 实现一个 std::upper_bound()
+    res = my_upper_bound(vec, 4);
+    cout << res << endl;
+    
+    it = std::upper_bound(vec.begin(), vec.end(), 4);
     cout << *it << endl;
 
     return 0;
