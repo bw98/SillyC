@@ -94,7 +94,8 @@ public:
     }
 
     void doBigTask() {
-        // Do part of B:add
+        // Do part of B:add via sync callback
+        // If u wanna know async callback, just look at how to update UI, like how GNOME, Chrome did
         B b;
 
         b.set_add_cb(std::bind(&A::printResult, std::placeholders::_1, false));
