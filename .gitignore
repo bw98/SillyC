@@ -36,4 +36,5 @@
 
 # Jetbrains IDE file
 .idea/
+.vscode/
 
