@@ -13,6 +13,6 @@ if __name__ == "__main__":
     a = A()
     b = B(a)
     b.a.avar = 999
-    print("[shallow copy]  a.avar = {}".format(a.avar))
-    print("[shallow copy]  b.a.avar = {}".format(b.a.avar))
+    print("[shallow copy] id of a.avar is {}, a.avar = {}".format(id(a.avar), a.avar))
+    print("[shallow copy] id of b.avar is {}, b.a.avar = {}".format(id(b.a.avar), b.a.avar))
  
