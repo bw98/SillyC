@@ -64,25 +64,42 @@ struct TreeNode {
 
 class Solution {
 public:
+    //
+    // 参考 labuladong 刷题笔记
+    // 对于任意一个节点，它怎么才能知道自己是不是 p 和 q 的最近公共祖先?
+    // 如果一个节点能够在它的左右子树中分别找到 p 和 q，则该节点为 LCA 节点
+    //
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
-        
-    }
-
-
-    // 输入一棵没有重复元素的二叉树根节点root和一个目标值val，请你写一个函数寻找树中值为val的节点
-    TreeNode* find(TreeNode* root, int val) {
-        if (!root) return nullptr;
-
-        if (root->val == val) {
-            return root;
-        } else {
-            TreeNode* t = find(root->left, val);
-            if (t) return t;
-            t = find(root->right, val);
-            if (t) return t;
+        find_left_ = false;
+        find_right_ = false;
+        TreeNode* res = find(root, p->val, q->val);
+        if (!find_left_ || !find_right_) {
+            return nullptr;
         }
-
-        return nullptr;
+        
+        return res;
+    }
+    
+private:
+    // 查找 val1 和 val2 的最近公共祖先
+    // 递归思路是找 val1 和 val2 等于当前的节点, 如果不等于的话，就进一步去查找子树
+    // （疑问）如果是纯前序遍历不带全局变量的话，能实现吗？（应该不能
+    TreeNode* find(TreeNode* root, int val1, int val2) {
+        if (!root) return nullptr;
+        
+        TreeNode* left = find(root->left, val1, val2);
+        TreeNode* right = find(root->right, val1, val2);
+        
+        if (left && right) {
+            return root;
+        }
+        if (root->val == val1 || root->val == val2) {
+            if (root->val == val1) find_left_ = true;
+            if (root->val == val2) find_right_ = true;
+            return root;
+        }
+        
+        return left ? left : right;
     }
 };
 
