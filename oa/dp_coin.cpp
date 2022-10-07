@@ -20,7 +20,7 @@
     
 class Solution {
 public:
-    int getMinCoinNumByDP(const std::vector<int>& coins, const std::vector<int>& nums, int k) {
+    int getMinCoinNumByDP(const std::vector<int>& coins, int k) {
         // dp[i][j] 表示使用 i 种硬币, 达到 j 金额的最小硬币数
         // 状态转移是, 如果使用第 i 种硬币, 则最小硬币数为
         //     min(dp[i][j], dp[i-1][j - 第i种硬币个数 * 对应面值] + 第i种硬币个数)
@@ -51,7 +51,7 @@ public:
         return res;
     }
 
-    int getMinCoinNumByDP2(const std::vector<int>& coins, const std::vector<int>& nums, int k) {
+    int getMinCoinNumByDP2(const std::vector<int>& coins, int k) {
         // 进一步优化, 优化时间
         // 其实最内层的 for loop, 即第 i 种硬币个数，这个维度可以忽略
         //
@@ -74,7 +74,7 @@ public:
         
         for (int  i = 1; i <= n; ++i) {
             for (int j = 1; j <= k; ++j) {
-                if (j  < coins[i - 1])  {
+                if (coins[i - 1] > j)  {
                     dp[i][j] = dp[i-1][j];
                 } else {
                     dp[i][j] = std::min(dp[i-1][j], dp[i][j - coins[i - 1]] + 1);
@@ -87,10 +87,11 @@ public:
         return res;
     }
     
-    int getMinCoinNumByDP3(const std::vector<int>& coins, const std::vector<int>& nums, int k) {
+    int getMinCoinNumByDP3(const std::vector<int>& coins, int k) {
         // 再进一步优化
         // 压缩空间到一维(滚动数组)
-        // dp[i][j] 只和 dp[i-1] 和 dp[i] 有关, 可以从右边往左打表, 节约第一维
+        // dp[i][j] 只和 dp[i-1][j] 和 dp[i][小于j的某个数] 有关, 这两个值分别位于当前值 dp[i][j] 的正上方和正左边,
+        // 所以可以只用第二维, 从左边往右打表, 节约第一维
         //
         
         int n = coins.size();
@@ -108,21 +109,21 @@ public:
         return res;
     }
 
-    // int getMinCoinNumByGreedy(const vector<int>& coins, const vector<int>& cnts, int k) {
+    // int getMinCoinNumByGreedy(const vector<int>& coins, int k) {
     //     return -1;
     // }
 };
 
 int main() {
-    std::vector<int> coins = { 1, 2, 5, 6, 11 };
-    std::vector<int> cnts = { INT_MAX, INT_MAX, INT_MAX };
+    std::vector<int> coins = { 1, 2, 5, 6, 11 };  // 每种硬币的面值
+    // std::vector<int> coin_cnts = { 1, 2, 3, 4, 5 };  // 每种硬币的个数
     int k = 22;
 
     Solution solution;
-    // int res = solution.getMinCoinNumByDP(coins, cnts, k);
-    // int res = solution.getMinCoinNumByDP2(coins, cnts, k);
-    int res = solution.getMinCoinNumByDP3(coins, cnts, k);
-    // int res = getMinCoinNumByGreedy(coins, cnts, k);
+    // int res = solution.getMinCoinNumByDP(coins, k);
+    // int res = solution.getMinCoinNumByDP2(coins, k);
+    int res = solution.getMinCoinNumByDP3(coins, k);
+    // int res = getMinCoinNumByGreedy(coins, k);
     std::cout << res << std::endl;
 
     return 0;
