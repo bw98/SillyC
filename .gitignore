@@ -38,3 +38,7 @@
 .idea/
 .vscode/
 
+# Python-associated File
+__pycache__/
+dask-worker-space/
+

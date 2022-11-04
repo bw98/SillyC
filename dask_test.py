@@ -129,6 +129,7 @@ if __name__ == "__main__":
     # 如果您想要更多控制，请改用分布式调度程序
     # 尽管名称中有“分布式”，但分布式调度程序在单台和多台机器上都能工作很好, 将其视为“高级调度程序”
     print("\n\n\n-------------------------Schedule and Execute--------------------------")
+    # dask.config.set(scheduler='process', num_workers=4)
     client = Client()
     print(client)
     # client = Client("<url-of-scheduler>")
