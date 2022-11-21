@@ -24,7 +24,6 @@
 #include <mutex>
 #include <shared_mutex>
 #include <atomic>
-#include <future>
 
 using std::cout;
 using std::endl;
@@ -55,11 +54,45 @@ using std::shared_mutex;
 using std::lock_guard;
 using std::unique_lock;
 using std::shared_lock;
-using std::future;
-using std::async;
 
+//
+// 给一个 string, 求没有重复字符的 substring 的个数
+//
+// 和 leetcode Q3 不是完全一样的题 (不过可能还可以试试 sliding window?)
+//
+// Input: ababc
+//
+// 该串的子串一共有 15 个
+// 子串    个数
+//  a       2 
+//  b       2
+//  c       1
+// ab       2
+// aba      1
+// abab     1
+// ababc    1
+// ba       1
+// bab      1
+// babc     1
+// abc      1
+// bc       1
+//
+// 其中, 不重复字符的子串有 a, b, c, ab, ba, abc, bc 七种, 总个数为 10 个
+//
+// Output: 10
+//
+int func(const string& s) {
+    int res = 0;
+
+    // 暂时只想到了暴力
+
+    return res;
+}
 
 int main() {
+    string s = "ababc";
+    cout << s << endl;
+    cout << func(s) << endl;
 
     return 0;
 }

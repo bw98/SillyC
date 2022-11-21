@@ -24,7 +24,6 @@
 #include <mutex>
 #include <shared_mutex>
 #include <atomic>
-#include <future>
 
 using std::cout;
 using std::endl;
@@ -55,11 +54,25 @@ using std::shared_mutex;
 using std::lock_guard;
 using std::unique_lock;
 using std::shared_lock;
-using std::future;
-using std::async;
 
+int SHARED_VALUE = 0;
+
+void incre_shared_value() {
+    SHARED_VALUE += 1;
+}
 
 int main() {
+    std::vector<std::thread> thd_vec;
+    thd_vec.reserve(10);
+	for (size_t i = 0; i < 100; ++i) {
+        thd_vec.push_back(std::thread(&incre_shared_value));
+	}
+
+    for (size_t i = 0; i < 100; ++i) {
+        thd_vec[i].join();
+    }
+
+    std::cout << "Current SHARED_VALUE is " << SHARED_VALUE << std::endl;
 
     return 0;
 }
