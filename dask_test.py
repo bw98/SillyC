@@ -9,6 +9,8 @@ from dask.distributed import Client
 
 
 if __name__ == "__main__":
+    # 创建 100 * 100 的矩阵, 每个 chunk 为 10 * 10
+    # x = da.random.random((100, 100), chunks=(10, 10))
     x = da.random.normal(10, 0.1, size=(100, 100), chunks=(10, 10))
     print(x)
     print(x.compute())

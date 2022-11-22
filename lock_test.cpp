@@ -1,36 +1,44 @@
 #include <iostream>
+#include <vector>
 #include <mutex>
 #include <atomic>
 #include <thread>
-#include <vector>
 
-using namespace std;
+using std::vector;
+using std::thread;
+using std::mutex;
+using std::atomic;
  
-class spin_lock {
+class SpinLock {
  public:
-    spin_lock() = default;
-    spin_lock(const spin_lock&) = delete;
-    spin_lock& operator= (const spin_lock&) = delete;
+    SpinLock() = default;
+    SpinLock(const SpinLock&) = delete;
+    SpinLock& operator= (const SpinLock&) = delete;
 
  public:
     void lock() {
+        // CAS, 原子比较(读) + 原子交换(写)
+        // 如果 atmoic 对象 flag_ 没有达到预期值就一直进行循环等待，当预期值相等的时候，进行交换
         bool expected = false;
-        while (!flag.compare_exchange_strong(expected, true)) expected = false;
+        while (!flag_.compare_exchange_strong(expected, true)) {
+            expected = false;
+        }
     }
 
     void unlock() {
-        flag.store(false);
+        flag_.store(false);
     }
 
- public: 
-    std::atomic<bool> flag = ATOMIC_VAR_INIT(false);
+ private: 
+    std::atomic<bool> flag_ = ATOMIC_VAR_INIT(false);
+    // std::atomic<bool> flag_;  // 默认初始化同上
 };
  
-long size = 100000;
-long total = 0;
+const int size = 100000;
+int total = 0;
 std::atomic_long total2(0);
 std::mutex mtx;
-spin_lock spin_lock;
+SpinLock spin_lock;
  
 void thread_click() {
     for (int i = 0; i < size; ++i) {
@@ -76,6 +84,7 @@ int main() {
     std::cout << "single thread time: " << end - start << std::endl;
  
     // multi thread without mutex
+    // Data race!
     total = 0;
     start = clock();
     for (int i = 0; i < thd_num; ++i) {

@@ -64,6 +64,9 @@ void incre_shared_value() {
 int main() {
     std::vector<std::thread> thd_vec;
     thd_vec.reserve(10);
+
+    // 编译链接时加入 sanitizer, 然后就可以在运行时检测 data race
+    // g++ -std=c++20 multi_thread_write_bug.cpp -fsanitize=thread -lpthread
 	for (size_t i = 0; i < 100; ++i) {
         thd_vec.push_back(std::thread(&incre_shared_value));
 	}
