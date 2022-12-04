@@ -85,18 +85,18 @@ int main() {
     std::future<bool> bg_thd = std::async(std::launch::async,
                                           bufferFileLoader);
     std::future_status status;
-    // Main loop
-    while (true) {
-        std::cout << "[Test2] Main thread is running" << std::endl;
-        // mimic IO
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        status = bg_thd.wait_for(std::chrono::milliseconds(1));
-        // Check If data is ready
-        if (status == std::future_status::ready) {
-            std::cout << "[Test2] file data is ready..." << std::endl;
-            break;
-        }
-    }
+    // // Main loop
+    // while (true) {
+    //     std::cout << "[Test2] Main thread is running" << std::endl;
+    //     // mimic IO
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    //     status = bg_thd.wait_for(std::chrono::milliseconds(1));
+    //     // Check If data is ready
+    //     if (status == std::future_status::ready) {
+    //         std::cout << "[Test2] file data is ready..." << std::endl;
+    //         break;
+    //     }
+    // }
 
     return 0;
 }

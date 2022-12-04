@@ -22,11 +22,12 @@ def info(title):
 if __name__ == '__main__':
     # Using Pool
     print ("Using Pool")
-    p_block = Pool(3)
-    print(p_block.apply(f, [ 666 ]))  # 阻塞式执行
-    print(p_block.apply_async(f, [ 666 ]))  # 非阻塞式执行
+    p = Pool(3)
+    print(p.apply(f, [ 666 ]))  # 阻塞式执行
+    print(p.apply_async(f, [ 666 ]))  # 非阻塞式执行
     # with Pool(5) as p:
-        # print(p.map(f, [ 1,2, 3, ]))
+        # print(p.map(f, [ 1,2, 3, ]))  # 阻塞
+        # print(p.map(f, [ 1,2, 3, ]))  # 非阻塞式执行, 需要调用 get() 拿到结果
 
     # Using Process class
     print ("Using Process class")

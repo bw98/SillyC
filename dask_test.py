@@ -133,6 +133,7 @@ if __name__ == "__main__":
     print("\n\n\n-------------------------Schedule and Execute--------------------------")
     # dask.config.set(scheduler='process', num_workers=4)
     client = Client()
+    # client = Client(n_workers=4)
     print(client)
     # client = Client("<url-of-scheduler>")
     # print(client)
