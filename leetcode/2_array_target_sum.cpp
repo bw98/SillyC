@@ -29,8 +29,6 @@
 using std::cout;
 using std::endl;
 using std::cin;
-using std::iota;
-using std::to_string;
 using std::vector;
 using std::string;
 using std::array;
@@ -60,8 +58,34 @@ using std::shared_lock;
 using std::future;
 using std::async;
 
+const int N = 1e5;
+int n, m;
+int target;
+int a[N], b[N];
 
 int main() {
+    // 数组元素的目标和
+    // 两个升序数组, 各拿出一个元素，它们的和刚好等于某个值
+    //
+    // 双指针, 一个指小，一个指大，然后往中间夹
+    // 参考: https://www.acwing.com/problem/content/802/
+    cin >> n >> m >> target;
+    for (int i = 0; i < n; ++i) cin >> a[i];
+    for (int i = 0; i < m; ++i) cin >> b[i];
+
+    // 6
+    // 1 2 4 7
+    // i
+    // 3 4 6 8 9
+    //   j
+    //
+    for (int i = 0, j = m - 1; i < n; ++i) {
+        while (j >= 0 && a[i] + b[j] > target) {
+            --j;
+        }
+
+        if (a[i] + b[j] == target) cout << i << " " << j << endl;
+    }
 
     return 0;
 }

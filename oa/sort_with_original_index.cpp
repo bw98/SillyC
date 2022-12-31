@@ -29,8 +29,6 @@
 using std::cout;
 using std::endl;
 using std::cin;
-using std::iota;
-using std::to_string;
 using std::vector;
 using std::string;
 using std::array;
@@ -60,8 +58,29 @@ using std::shared_lock;
 using std::future;
 using std::async;
 
+struct Item {
+    int val;
+    size_t idx;
+};
 
 int main() {
+    vector<int> nums = { 1, 2, 5, 4, 3 };
+    cout << "Original array is ";
+    std::for_each(nums.begin(), nums.end(), [](int x) { cout << x << ", "; });
+    cout << endl;
+    // sort(nums.begin(), nums.end());
+    // 此时如果需要输出最大元素在(原)数组中的位置, 就无能为力了
+
+    vector<Item> items(nums.size());
+    for (size_t i = 0; i < nums.size(); ++i) {
+        items[i].val = nums[i];
+        items[i].idx = i;
+    }
+    sort(items.begin(), items.end(),
+         [](Item& a, Item& b) { return a.val < b.val; }
+    );
+    cout << "Max element is " << prev(items.end())->val << 
+        ", its idx in original array is " << prev(items.end())->idx << endl;
 
     return 0;
 }

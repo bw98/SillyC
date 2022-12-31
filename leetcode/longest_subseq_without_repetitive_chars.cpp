@@ -29,8 +29,6 @@
 using std::cout;
 using std::endl;
 using std::cin;
-using std::iota;
-using std::to_string;
 using std::vector;
 using std::string;
 using std::array;
@@ -60,8 +58,30 @@ using std::shared_lock;
 using std::future;
 using std::async;
 
+const int N = 1e5 + 10;
+int a[N];
+int cnt[10];
+int n;  // n 个数
+int res;
 
 int main() {
+    // AcWing 799. 最长连续不重复子序列
+    // 双指针 (其实就是滑动窗口)
+    // 参考 https://www.acwing.com/problem/content/801/
+    // 元素全是数字
+    cin >> n;
+    for (int i = 0; i < n; ++i) cin >> a[i];
+
+    for (int i = 0, j = 0; i < n; ++i) {
+       cnt[a[i]] += 1;
+       while (j <= i && cnt[a[i]] > 1) {
+           cnt[a[j++]] -= 1;
+       }
+
+       res = std::max(res, i - j + 1);
+    }
+
+    cout << res << endl;
 
     return 0;
 }

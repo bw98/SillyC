@@ -29,8 +29,6 @@
 using std::cout;
 using std::endl;
 using std::cin;
-using std::iota;
-using std::to_string;
 using std::vector;
 using std::string;
 using std::array;
@@ -62,6 +60,19 @@ using std::async;
 
 
 int main() {
+    set<int> st;
+    st.emplace(5);
+    st.emplace(10);
+    st.emplace(12);
+    st.emplace(2);
+    st.emplace(3);
+
+    int target = 5;
+    auto iter = st.lower_bound(target);
+    cout << *(--iter) << endl;
+    cout << *(++iter) << endl;
+    iter = st.upper_bound(target);
+    cout << *iter << endl;
 
     return 0;
 }

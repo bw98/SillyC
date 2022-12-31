@@ -1,11 +1,11 @@
 import asyncio
 import time
 
-async def others(i: int):
-    print('[others] start, i is ', i)
-    await asyncio.sleep(i)
-    print('[others] end, i is ', i)
-    return '[others response] 返回值: ' + str(i)
+async def others(sec: int):
+    print('[others] start, sleep second is ', sec)
+    await asyncio.sleep(sec)
+    print('[others] start, sleep second is ', sec)
+    return '[others response] 返回值: ' + str(sec)
 
 async def func():
     print('[func] 执行协程函数 func 内部代码')
@@ -20,10 +20,10 @@ async def func2():
     print('[func2] IO请求结束，结果为: ', response)
 
 async def func3():
-    # Test
+    print('[func3] 执行协程函数 func3 内部代码')
     for i in range(1, 4):
         await asyncio.sleep(i)
-        print("[func3] i = ", i)
+        print("[func3] sleep second = ", i)
 
 async def main():
     # 将协程对象封装成task对象，并将协程立即加入事件循环，同时追踪协程的状态

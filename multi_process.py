@@ -4,6 +4,7 @@
 #
 
 import os
+import time
 from multiprocessing import Pool
 from multiprocessing import Process
 
@@ -12,12 +13,14 @@ def f(x):
     print("In f function")
     return x * x
 
-def info(title):
+def info(title, sleep_sec):
+    time.sleep(sleep_sec)
     print("In info function")
     print(title)
     print('module name:', __name__)
     print('parent process:', os.getppid())
     print('process id:', os.getpid())
+
 
 if __name__ == '__main__':
     # Using Pool
@@ -31,9 +34,9 @@ if __name__ == '__main__':
 
     # Using Process class
     print ("Using Process class")
-    p1 = Process(target=info, args=('hey Jude',))
+    p1 = Process(target=info, args=('Process 1', 9))
     p1.start()
-    p2 = Process(target=info, args=('Press F',))
+    p2 = Process(target=info, args=('Process 2', 3))
     p2.start()
     p1.join()
     p2.join()
