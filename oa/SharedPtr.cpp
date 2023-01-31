@@ -152,7 +152,7 @@ private:
 
 int main() {
     {
-        SharedPtr<MyTest> sp1(new MyTest(666, "666"));
+        SharedPtr<MyTest> sp1(new MyTest(666, "666"));  // 当然也可以实现一个 make_shared, 基于不定参模板和转发, 只是 oa 时间不够用了
         cout << "[Just Created] Reference Count: " << sp1.RefCount() << endl;
         {
             SharedPtr<MyTest> sp2 = sp1;

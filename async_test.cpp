@@ -64,7 +64,7 @@ bool bufferFileLoader() {
     size_t bytes = 0;
     while (bytes < 20000) {
         std::cout << "[Test2] Loading file..." << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         bytes += 1024;
     }
     return true;
@@ -85,18 +85,19 @@ int main() {
     std::future<bool> bg_thd = std::async(std::launch::async,
                                           bufferFileLoader);
     std::future_status status;
-    // // Main loop
-    // while (true) {
-    //     std::cout << "[Test2] Main thread is running" << std::endl;
-    //     // mimic IO
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    //     status = bg_thd.wait_for(std::chrono::milliseconds(1));
-    //     // Check If data is ready
-    //     if (status == std::future_status::ready) {
-    //         std::cout << "[Test2] file data is ready..." << std::endl;
-    //         break;
-    //     }
-    // }
+    std::cout << "[Test2] Aysnc task is ready to run" << std::endl;
+    // Main loop
+    while (true) {
+        std::cout << "[Test2] Main Loop is running" << std::endl;
+        // mimic IO
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        status = bg_thd.wait_for(std::chrono::milliseconds(1));
+        // Check If data is ready
+        if (status == std::future_status::ready) {
+            std::cout << "[Test2] file data is all loaded..." << std::endl;
+            break;
+        }
+    }
 
     return 0;
 }
