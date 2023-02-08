@@ -1,28 +1,18 @@
 """
 简单测试了一下没有使用以及使用 yield 时, 计算平方数代码的运行时间以及内存使用情况
 
-For yield-disabled code:
+总论:
+当生成数字的个数为十万到千万时, 对于执行速度, 非 yield 并且存储中间结果的版本代码(test0)是 yield 版本代码(test2)的 1.5 倍 (快一半),
+非 yield 不存储中间结果的版本(test1)比 yield 版本(test2)快了 14.75%;
+对于内存占用来说, test0 从 kb 暴涨到 mb 级别, 而 test1 和 yield 版本代码(test2)一直都是 byte 级别
 
-    Test disabled 'yield' Start...
-    [Disable yield] Calculated sum of squre numbers, which is 33395.189080753276
-    Time cost is 0.08385491371154785 second
-    /Users/weifeng.lai/SillyCodeCollection/yield_good_for_memory.py:12: size=781 KiB, count=2, average=391 KiB
-    /Users/weifeng.lai/SillyCodeCollection/yield_good_for_memory.py:13: size=28 B, count=1, average=28 B
-    /Users/weifeng.lai/SillyCodeCollection/yield_good_for_memory.py:14: size=24 B, count=1, average=24 B
-    Test End...
+Addition by 02/04/2023:
+It's not a good example to analyze the pros/cons of 'yield'.
+Just look at test1 and test2, if we don't use 'yield', it can still run in just a small piece of memory like bytes,
+because we don't save the intermediate data in a list or other data structures.
+But we can still assume that 'yield' can save usage rate of memory. Just think about scenario, in an AI project, a function can
+generate very large data and we can't get all the resullt at once. So we have to use 'yield' to get data in batches.
 
-For yield-enabled code:
-    Test enabled 'yield' Start...
-    [Enable yield] Calculated sum of squre numbers, which is 33367.23246257554
-    Time cost is 0.11679911613464355 second
-    /Users/weifeng.lai/SillyCodeCollection/yield_good_for_memory.py:35: size=112 B, count=1, average=112 B
-    /Users/weifeng.lai/SillyCodeCollection/yield_good_for_memory.py:27: size=79 B, count=2, average=40 B
-    /Users/weifeng.lai/SillyCodeCollection/yield_good_for_memory.py:26: size=76 B, count=2, average=38 B
-    /Users/weifeng.lai/SillyCodeCollection/yield_good_for_memory.py:36: size=28 B, count=1, average=28 B
-    Test End...
-
-总论: 当生成数字的个数为十万到千万时, 对于执行速度, 非 yield 版本代码是 yield 版本代码的 1.5 倍 (快一半),
-但是对于内存占用来说, yield 版本代码一直都是 byte 级别, 而非 yield 版本代码占用的代码从 kb 暴涨到 mb 级别
 
 """
 
@@ -33,16 +23,36 @@ import numpy as np
 N = 10000000
 tracemalloc.start()
 
-def get_squre_numbers_test(num_len):
+def get_squre_numbers_test0(num_len):
     start_time = time.time()
 
     s = 0
-    random_list = np.random.rand(num_len)
+    random_list = np.random.rand(num_len)  # Store intermediate result
     for i in range(N):
         s += random_list[i] ** 2
 
     end_time = time.time()
-    print('[Disable yield] Calculated sum of squre numbers, which is {}'.format(s))
+    print('[Disable yield but store intermediate result] Calculated sum of squre numbers, which is {}'.format(s))
+    print('Time cost is {} second'.format(end_time - start_time))
+    snapshot = tracemalloc.take_snapshot()
+    top_stats = snapshot.statistics('lineno')
+    for stat in top_stats[:5]:
+        print(stat)
+
+
+def get_random_squre_number():
+    return np.random.random() ** 2
+
+
+def get_squre_numbers_test1(num_len):
+    start_time = time.time()
+
+    s = 0
+    for i in range(N):
+        s += get_random_squre_number()
+
+    end_time = time.time()
+    print('[Disable yield and not store intermediate result] Calculated sum of squre numbers, which is {}'.format(s))
     print('Time cost is {} second'.format(end_time - start_time))
     snapshot = tracemalloc.take_snapshot()
     top_stats = snapshot.statistics('lineno')
@@ -53,6 +63,7 @@ def get_squre_numbers_test(num_len):
 def yield_random_number(num_len):
     for i in range(num_len):
         yield np.random.random()
+
 
 def get_squre_numbers_test2(num_len):
     start_time = time.time()
@@ -74,8 +85,12 @@ def get_squre_numbers_test2(num_len):
 
 
 if __name__ == '__main__':
-    print("Test disabled 'yield' Start...")
-    get_squre_numbers_test(N)
+    print("Test disabled 'yield' and store intermediate data Start...")
+    get_squre_numbers_test0(N)
+    print('Test End...\n\n')
+
+    print("Test disabled 'yield' and not store intermediate data Start...")
+    get_squre_numbers_test1(N)
     print('Test End...\n\n')
 
     print("Test enabled 'yield' Start...")
