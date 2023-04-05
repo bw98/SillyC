@@ -16,6 +16,7 @@ class ThreadSafeVector {
             ++size_;
         }
     }
+
     const Type&
     operator[](int64_t index) const {
         Assert(index < size_);

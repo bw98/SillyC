@@ -34,6 +34,7 @@ using std::string;
 using std::array;
 using std::list;
 using std::forward_list;
+using std::deque;
 using std::map;
 using std::set;
 using std::pair;
@@ -60,31 +61,25 @@ using std::async;
 
 std::atomic_flag flag = ATOMIC_FLAG_INIT;
 
-bool iotask() {
-    cout << "[iotask] do an io task..." << endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+bool iotask(int sec) {
+    cout << "[iotask] do an io task on thread " << std::this_thread::get_id() << endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(sec *1000));
     return true;
 }
 
 bool task1() {
-    int64_t cnt1 = 0;
-
+    cout << "[task1] task1 on thread " << std::this_thread::get_id() << endl;
+    int64_t cnt = 0;
     while (true) {
-        // cout << "[task1] do count" << endl;
-        ++cnt1;
-        if (cnt1 % 1000 == 0) cout << "[task1] cur cnt1 = " << cnt1 << endl;
+        ++cnt;
+        if (cnt % 10 == 0) cout << "[task1] Go into task1 main loop " << cnt  << " times" << endl;
 
-        // 做了个测试, 这么写的话当前线程还是会阻塞执行 io 任务
-        // if (cnt1 % 123 == 0) {
-        //     cout << "[task1] gonna do an io task" << endl;
-        //     // iotask();
-        //     std::future<bool> io_thd = std::async(std::launch::async,
-        //                                           iotask);
-        // }
+        // Fake an time-cost task on current thread
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        if (cnt1 == 10000) {
-            // Notify thread holding task2, but must be in non-blocking way
-            cout << "[task1] gonna notify task2" << endl;
+        // Notify thread holding task2, but must be in non-blocking way
+        if (cnt == 100) {
+            cout << "[task1] gonna notify task2 because flag will be changed" << endl;
             flag.test_and_set();
             break;
         }
@@ -96,23 +91,38 @@ bool task1() {
 }
 
 bool task2() {
-    int64_t cnt2 = 0;
-
+    cout << "[task2] task2 on thread " << std::this_thread::get_id() << endl;
+    int64_t cnt = 0;
+    int future_task_num = 0;
+    int future_task_done = 0;
+    // 想在线程 B 异步执行 io task 的话，必须要保证 future 对象不在 main loop 中被析构,
+    // 否则其会转成同步对象并阻塞线程B 
+    // 详情参考 stackoverflow.com/questions/44654548/stdasync-doesnt-work-asynchronously
+    list<future<bool>> future_tasks;
     while (true) {
-        // cout << "[task2] do count" << endl;
-        ++cnt2;
-        if (cnt2 % 1000 == 0) cout << "[task2] cur cnt2 = " << cnt2 << endl;
+        ++cnt;
+        if (cnt % 1000000 == 0) cout << "[task2] Go into task2 main loop " << cnt  << " times" << endl;
 
-        // 做了个测试, 这么写的话当前线程还是会阻塞执行 io 任务
-        if (cnt2 % 3000 == 0) {
+        // Async run io task
+        if (cnt % 50000 == 0 && future_task_num < 3) {
             cout << "[task2] gonna do an io task" << endl;
-            // iotask();
-            std::future<bool> io_thd = std::async(std::launch::async,
-                                                  iotask);
+            ++future_task_num;
+            std::future<bool> f = std::async(std::launch::async, iotask, future_task_num);
+            future_tasks.push_back(std::move(f));
+        }
+
+        for (auto iter = future_tasks.begin(); iter != future_tasks.end(); ) {
+            auto status = iter->wait_for(std::chrono::milliseconds(0));
+            if(status == std::future_status::ready) {
+                ++future_task_done;
+                cout << "[task2] " << future_task_done << " IO tasks get done" << endl;
+                iter = future_tasks.erase(iter);
+            } else {
+                ++iter;
+            }
         }
     
-        // Thread is waiting to be notified by the thread holding task1, 
-        // but must run in non-blocking way, sort of like `Channel` in Go
+        // Check 线程 A 的通知
         if (flag.test()) {
             cout << "[task2] being notified" << endl;
             break;
@@ -124,8 +134,8 @@ bool task2() {
     return true;
 }
 
-// 线程通知问题（xuezhang说和同步还有点不太一样，但是我感觉还是同步问题）
-// 两线程线程 A 有一个变量 alpha，一旦变化就通知 (Notify) 线程 B
+// 线程通知问题（niu学长说和同步还有点不太一样，但是我感觉还是同步问题）
+// 两线程线程 A 有一个变量 flag，一旦变化就通知 (Notify) 线程 B
 // 不想让线程 B 一直阻塞等待
 
 int main() {
