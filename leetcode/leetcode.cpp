@@ -8,6 +8,7 @@
 #include <forward_list>
 #include <queue>
 #include <stack>
+#include <deque>
 #include <algorithm>
 #include <numeric>
 #include <iterator>
@@ -34,6 +35,10 @@ using std::string;
 using std::array;
 using std::list;
 using std::forward_list;
+using std::queue;
+using std::priority_queue;
+using std::stack;
+using std::deque;
 using std::map;
 using std::set;
 using std::pair;

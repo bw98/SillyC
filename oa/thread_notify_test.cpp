@@ -134,9 +134,8 @@ bool task2() {
     return true;
 }
 
-// 线程通知问题（niu学长说和同步还有点不太一样，但是我感觉还是同步问题）
-// 两线程线程 A 有一个变量 flag，一旦变化就通知 (Notify) 线程 B
-// 不想让线程 B 一直阻塞等待
+// niu学长出的线程通知问题
+// 两线程线程 A 有一个变量 flag，一旦变化就通知 (Notify) 线程 B, 不想让线程 B 一直阻塞等待
 
 int main() {
     vector<thread> threads;
