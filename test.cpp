@@ -62,6 +62,8 @@ using std::shared_mutex;
 using std::lock_guard;
 using std::unique_lock;
 using std::shared_lock;
+using std::condition_variable;
+using std::atomic;
 using std::future;
 using std::async;
 
