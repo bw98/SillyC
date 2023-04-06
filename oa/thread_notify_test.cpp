@@ -67,6 +67,10 @@ bool iotask(int sec) {
     return true;
 }
 
+void iotask_callback(bool result) {
+    std::cout << "[iotask callback] io task 异步操作已完成，结果为 " << result << std::endl;
+}
+
 bool task1() {
     cout << "[task1] task1 on thread " << std::this_thread::get_id() << endl;
     int64_t cnt = 0;
@@ -108,6 +112,7 @@ bool task2() {
             cout << "[task2] gonna do an io task" << endl;
             ++future_task_num;
             std::future<bool> f = std::async(std::launch::async, iotask, future_task_num);
+            // f.then(iotask_callback);  // boost 支持这么做 callback
             future_tasks.push_back(std::move(f));
         }
 

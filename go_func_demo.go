@@ -29,6 +29,8 @@ func test1() {
 		fmt.Println(67)
 		wg.Done()
 	}()
+
+    print("in test1()\n")
 	
     wg.Wait()
 }
@@ -38,9 +40,10 @@ func test2() {
 	wg := sync.WaitGroup{}
 	wg.Add(20)
 
-    // go func 传参 bug
+    // go func 传参 坑点
 	for i := 0; i < 10; i++ {
 		go func() {
+            print("in test2() goroutine A\n")
 			fmt.Println("A: ", i)
 			wg.Done()
 		} ()
@@ -48,10 +51,14 @@ func test2() {
 
     for i := 0; i < 10; i++ {
 		go func(i int) {
+            print("in test2() goroutine B\n")
 			fmt.Println("B: ", i)
 			wg.Done()
 		} (i)
 	}
+
+	// time.Sleep(time.Second)
+    print("in test2()\n")
 
 	wg.Wait()
 }

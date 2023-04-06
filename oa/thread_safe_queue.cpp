@@ -99,7 +99,7 @@ private:
     std::atomic<uint64_t> size_;
     uint64_t max_size_;
     std::shared_mutex mtx_;
-    // std::condition_variable cv;
+    // std::condition_variable cv;  // 或者使用 std::atomic_flag, 用法和 cv 一样
 };
 
 template<typename T>

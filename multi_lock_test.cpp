@@ -12,26 +12,32 @@ using std::atomic;
 class SpinLock {
  public:
     SpinLock() = default;
+
     SpinLock(const SpinLock&) = delete;
-    SpinLock& operator= (const SpinLock&) = delete;
+
+    SpinLock&
+    operator= (const SpinLock&) = delete;
 
  public:
-    void lock() {
+    void
+    lock() {
         // CAS, 原子比较(读) + 原子交换(写)
         // 如果 atmoic 对象 flag_ 没有达到预期值就一直进行循环等待，当预期值相等的时候，进行交换
-        bool expected = false;
-        while (!flag_.compare_exchange_strong(expected, true)) {
-            expected = false;
+        bool expect = false;
+        bool desire = true;  // If flag_ value is equal to expect, then set it as desire, and return true
+        while (!flag_.compare_exchange_strong(expect, desire)) {
+            expect = false;  // expect 复原, 因为 compare_exchange_strong false 时会加载 *this 到 expect
         }
     }
 
-    void unlock() {
+    void
+    unlock() {
         flag_.store(false);
     }
 
  private: 
-    std::atomic<bool> flag_ = ATOMIC_VAR_INIT(false);
-    // std::atomic<bool> flag_;  // 默认初始化同上
+    // std::atomic<bool> flag_ = ATOMIC_VAR_INIT(false);
+    std::atomic<bool> flag_;  // 默认初始化同上
 };
  
 const int size = 100000;
@@ -69,6 +75,9 @@ void spin_lock_click() {
 }
  
 int main() {
+    // 测试内容: 启动 thd_num 个线程, 每个线程执行 XXX_click 将变量 total 加 size 次
+    // 如果保证加法是线程安全的, 则变量 total 的结果应该是 thd_num * size 
+
     int thd_num = 100;
     std::vector<std::thread> threads(thd_num);
     clock_t start, end;
